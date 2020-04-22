@@ -1,6 +1,7 @@
 <template>
   <div id="main" :class="{
       'has-background-dark': $store.state.theme.isDark}">
+    <top-bar></top-bar>
     <nuxt />
   </div>
 </template>
@@ -14,3 +15,9 @@ div#main {
 }
 
 </style>
+<script>
+  import TopBar from "../components/TopBar";
+  export default {
+    components: {TopBar}
+  }
+</script>

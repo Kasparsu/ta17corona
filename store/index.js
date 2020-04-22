@@ -9,6 +9,10 @@ export const state = () => ({
   theme: {
     isDark: true
   },
+  timeline: {
+    loading: false,
+    confirmed: []
+  },
   stats: {
     labels: {
       TotalConfirmed: 'Total Confirmed',
@@ -33,6 +37,12 @@ export const mutations = {
   },
   SET_SORT(state, payload){
     state.filters.sort = payload;
+  },
+  SET_TIMELINE_CONFIRMED(state, payload){
+    state.timeline.confirmed = payload;
+  },
+  SET_TIMELINE_LOADING(state, payload){
+    state.timeline.loading = payload;
   }
 };
 
@@ -44,6 +54,13 @@ export const actions = {
   },
   toggleIsDark({commit, state}){
     commit('SET_ISDARK', !state.theme.isDark);
+  },
+  fetchTimelineConfirmed({commit}, slug){
+    commit('SET_TIMELINE_LOADING', true);
+    this.$axios.$get(`https://api.covid19api.com/dayone/country/${slug}/status/confirmed/live`).then(resp => {
+      commit('SET_TIMELINE_CONFIRMED', resp);
+      commit('SET_TIMELINE_LOADING', false);
+    });
   }
 };
 
@@ -65,5 +82,22 @@ export const getters = {
     return values.sort((a, b) => {
       return b[state.filters.sort] - a[state.filters.sort] ;
     })
-  }
+  },
+  confirmedTimelineLabels(state){
+    return state.timeline.confirmed
+      .map(data => data.Date)
+      .filter((value,index,self) => self.indexOf(value) === index);
+  },
+  confirmedTimelineData(state, getters){
+    let data = [];
+    getters.confirmedTimelineLabels.forEach((date,index) => {
+      data[index] = 0;
+      state.timeline.confirmed.forEach(stat => {
+        if(stat.Date === date) {
+          return data[index] += stat.Cases;
+        }
+      })
+    });
+    return data;
+  },
 };

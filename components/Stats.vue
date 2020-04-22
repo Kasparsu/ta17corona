@@ -2,14 +2,16 @@
   <div class="card"
        :class="{
       'has-background-grey-dark has-text-warning': $store.state.theme.isDark}">
-    <header class="card-header">
-      <p class="card-header-title"
-         :class="{
-      'has-text-danger': $store.state.theme.isDark}"
-      >
-        {{country.Country}}
-      </p>
-    </header>
+    <nuxt-link :to="country.Slug">
+      <header class="card-header">
+        <p class="card-header-title"
+           :class="{
+        'has-text-danger': $store.state.theme.isDark}"
+        >
+          {{country.Country}}
+        </p>
+      </header>
+    </nuxt-link>
     <div class="card-content">
       <div class="content">
         <table>
