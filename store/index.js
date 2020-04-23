@@ -11,7 +11,10 @@ export const state = () => ({
   },
   timeline: {
     loading: false,
-    confirmed: []
+    confirmed: [],
+    deaths: [],
+    recovered: [],
+    active: 'confirmed'
   },
   stats: {
     labels: {
@@ -41,8 +44,17 @@ export const mutations = {
   SET_TIMELINE_CONFIRMED(state, payload){
     state.timeline.confirmed = payload;
   },
+  SET_TIMELINE_DEATHS(state, payload){
+    state.timeline.deaths = payload;
+  },
+  SET_TIMELINE_RECOVERED(state, payload){
+    state.timeline.recovered = payload;
+  },
   SET_TIMELINE_LOADING(state, payload){
     state.timeline.loading = payload;
+  },
+  SET_ACTIVE_TIMELINE(state, payload){
+    state.timeline.active = payload;
   }
 };
 
@@ -55,10 +67,11 @@ export const actions = {
   toggleIsDark({commit, state}){
     commit('SET_ISDARK', !state.theme.isDark);
   },
-  fetchTimelineConfirmed({commit}, slug){
+  fetchTimeline({commit}, {slug, type}){
     commit('SET_TIMELINE_LOADING', true);
-    this.$axios.$get(`https://api.covid19api.com/dayone/country/${slug}/status/confirmed/live`).then(resp => {
-      commit('SET_TIMELINE_CONFIRMED', resp);
+    this.$axios.$get(`https://api.covid19api.com/dayone/country/${slug}/status/${type}/live`).then(resp => {
+      commit('SET_TIMELINE_' + type.toUpperCase(), resp);
+      commit('SET_ACTIVE_TIMELINE', type);
       commit('SET_TIMELINE_LOADING', false);
     });
   }
@@ -83,16 +96,16 @@ export const getters = {
       return b[state.filters.sort] - a[state.filters.sort] ;
     })
   },
-  confirmedTimelineLabels(state){
-    return state.timeline.confirmed
+  activeTimelineLabels(state){
+    return state.timeline[state.timeline.active]
       .map(data => data.Date)
       .filter((value,index,self) => self.indexOf(value) === index);
   },
-  confirmedTimelineData(state, getters){
+  activeTimelineData(state, getters){
     let data = [];
-    getters.confirmedTimelineLabels.forEach((date,index) => {
+    getters.activeTimelineLabels.forEach((date,index) => {
       data[index] = 0;
-      state.timeline.confirmed.forEach(stat => {
+      state.timeline[state.timeline.active].forEach(stat => {
         if(stat.Date === date) {
           return data[index] += stat.Cases;
         }

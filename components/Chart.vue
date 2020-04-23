@@ -1,5 +1,8 @@
 <template>
-  <canvas ref="myChart"></canvas>
+  <div>
+    <canvas height="100" ref="myChart"></canvas>
+  </div>
+
 </template>
 
 <script>
@@ -7,7 +10,18 @@
     export default {
       name: "chart",
       props: ['labels', 'data'],
+      watch: {
+        data: function (data, oldData) {
+          this.chart.data.datasets[0].data = data;
+          this.chart.update();
+        },
+        labels: function (labels, oldLabels) {
+          this.chart.data.labels = labels;
+          this.chart.update();
+        }
+      },
       mounted() {
+        console.log('chart')
         this.chart = new Chart(this.$refs['myChart'], {
           // The type of chart we want to create
           type: 'line',
