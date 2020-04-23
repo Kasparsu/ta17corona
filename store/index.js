@@ -101,11 +101,35 @@ export const getters = {
       .map(data => data.Date)
       .filter((value,index,self) => self.indexOf(value) === index);
   },
-  activeTimelineData(state, getters){
+  confirmed(state, getters){
     let data = [];
     getters.activeTimelineLabels.forEach((date,index) => {
       data[index] = 0;
-      state.timeline[state.timeline.active].forEach(stat => {
+      state.timeline.confirmed.forEach(stat => {
+        if(stat.Date === date) {
+          return data[index] += stat.Cases;
+        }
+      })
+    });
+    return data;
+  },
+  deaths(state, getters){
+    let data = [];
+    getters.activeTimelineLabels.forEach((date,index) => {
+      data[index] = 0;
+      state.timeline.deaths.forEach(stat => {
+        if(stat.Date === date) {
+          return data[index] += stat.Cases;
+        }
+      })
+    });
+    return data;
+  },
+  recovered(state, getters){
+    let data = [];
+    getters.activeTimelineLabels.forEach((date,index) => {
+      data[index] = 0;
+      state.timeline.recovered.forEach(stat => {
         if(stat.Date === date) {
           return data[index] += stat.Cases;
         }

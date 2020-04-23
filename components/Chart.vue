@@ -1,6 +1,7 @@
 <template>
   <div>
     <canvas height="100" ref="myChart"></canvas>
+    <slot></slot>
   </div>
 
 </template>
@@ -9,12 +10,24 @@
     import Chart from 'chart.js';
     export default {
       name: "chart",
-      props: ['labels', 'data'],
+      props: ['labels'],
+      updated() {
+        console.log('updated');
+        this.chart.data.datasets = this.$children.map(dataset => {
+          return {
+              label: dataset.title,
+              backgroundColor: dataset.color,
+              borderColor: dataset.color,
+              data: dataset.data
+            }
+        });
+        this.chart.update();
+      },
       watch: {
-        data: function (data, oldData) {
-          this.chart.data.datasets[0].data = data;
-          this.chart.update();
-        },
+        // data: function (data, oldData) {
+        //   this.chart.data.datasets[0].data = data;
+        //   this.chart.update();
+        // },
         labels: function (labels, oldLabels) {
           this.chart.data.labels = labels;
           this.chart.update();
@@ -29,12 +42,12 @@
           // The data for our dataset
           data: {
             labels: this.labels,
-            datasets: [{
-              label: 'My First dataset',
-              backgroundColor: 'rgb(255, 99, 132)',
-              borderColor: 'rgb(255, 99, 132)',
-              data: this.data
-            }]
+            // datasets: [{
+            //   label: 'My First dataset',
+            //   backgroundColor: 'rgb(255, 99, 132)',
+            //   borderColor: 'rgb(255, 99, 132)',
+            //   data: this.data
+            // }]
           },
 
           // Configuration options go here
