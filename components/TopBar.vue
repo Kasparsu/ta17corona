@@ -7,6 +7,11 @@
           <span>Home</span>
         </nuxt-link>
       </li>
+      <li>
+        <nuxt-link to="/map">
+          <span>Map</span>
+        </nuxt-link>
+      </li>
     </ul>
   </div>
 </template>

@@ -24,6 +24,13 @@ export const state = () => ({
       NewDeaths: 'New Deaths',
       TotalRecovered: 'Total Recovered',
       NewRecovered: 'New Recovered',
+      confirmedPerPop: 'Confirmed per population',
+      population: 'Population'
+    }
+  },
+  map: {
+    geojson: {
+      features: []
     }
   }
 });
@@ -55,12 +62,15 @@ export const mutations = {
   },
   SET_ACTIVE_TIMELINE(state, payload){
     state.timeline.active = payload;
+  },
+  SET_GEOJSON(state,payload){
+    state.map.geojson = payload;
   }
 };
 
 export const actions = {
   fetchSummary({commit}){
-    this.$axios.$get('https://api.covid19api.com/summary').then(resp => {
+    this.$axios.$get('http://localhost:8000/api/summary').then(resp => {
       commit('SET_SUMMARY', resp);
     });
   },
@@ -69,11 +79,16 @@ export const actions = {
   },
   fetchTimeline({commit}, {slug, type}){
     commit('SET_TIMELINE_LOADING', true);
-    this.$axios.$get(`https://api.covid19api.com/dayone/country/${slug}/status/${type}/live`).then(resp => {
+    this.$axios.$get(`http://localhost:8000/api/corona/dayone/country/${slug}/status/${type}/live`).then(resp => {
       commit('SET_TIMELINE_' + type.toUpperCase(), resp);
       commit('SET_ACTIVE_TIMELINE', type);
       commit('SET_TIMELINE_LOADING', false);
     });
+  },
+  fetchGeoJson({commit}){
+    this.$axios.$get('http://localhost:8000/api/geojson').then(resp=> {
+      commit('SET_GEOJSON', resp);
+    })
   }
 };
 
@@ -93,7 +108,13 @@ export const getters = {
   sortedCountries(state, getters){
     let values = JSON.parse(JSON.stringify(getters.searchCountries));
     return values.sort((a, b) => {
-      return b[state.filters.sort] - a[state.filters.sort] ;
+      if(b[state.filters.sort] > a[state.filters.sort]) {
+        return 1;
+      }
+      if(b[state.filters.sort] < a[state.filters.sort]) {
+        return -1;
+      }
+      return 0;
     })
   },
   activeTimelineLabels(state){
@@ -137,4 +158,8 @@ export const getters = {
     });
     return data;
   },
+  geoJson(state){
+    let features = state.map.geojson.features;
+    return {type: "FeatureCollection", features: features};
+  }
 };
