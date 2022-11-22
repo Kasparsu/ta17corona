@@ -16,7 +16,7 @@
     "chart.js": "^2.9.3",
     "leaflet": "^1.6.0",
     "node-sass": "^4.13.1",
-    "nuxt": "^2.0.0",
+    "nuxt": "^2.15.8",
     "sass-loader": "^8.0.2"
   },
   "devDependencies": {}
